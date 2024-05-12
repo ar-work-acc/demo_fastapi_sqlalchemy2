@@ -1,12 +1,16 @@
+from decimal import Decimal
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from model.product import ProductType
 from schema.product import ProductInput
 from service.product import create_product
 
 
-async def test_get_product(session):
+async def test_get_product(session: AsyncSession) -> None:
     input_product = ProductInput(
         product_name="test other",
-        unit_price=100,
+        unit_price=Decimal(100),
     )
     product = await create_product(session, input_product)
     assert product.product_id is not None

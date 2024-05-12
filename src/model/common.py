@@ -1,13 +1,14 @@
 """
 Common utility functions.
 """
+
 import re
 
 from sqlalchemy.orm import validates
 
 
 def is_email_valid(email):
-    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     if re.match(pattern, email):
         return True
     else:

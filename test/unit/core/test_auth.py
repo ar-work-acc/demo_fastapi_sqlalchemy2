@@ -8,7 +8,7 @@ from core.config import PROJECT_SETTINGS
 from model.employee import Employee
 
 
-def test_get_password_hash():
+def test_get_password_hash() -> None:
     # Test a simple password
     password = "mysecretpassword"
     hashed_password = get_password_hash(password)
@@ -22,7 +22,7 @@ def test_get_password_hash():
     assert isinstance(hashed_empty_password, str)
 
 
-def test_verify_password():
+def test_verify_password() -> None:
     # Test correct password
     password = "mysecretpassword"
     hashed_password = get_password_hash(password)
@@ -38,7 +38,7 @@ def test_verify_password():
     assert verify_password(empty_password, hashed_empty_password)
 
 
-def test_create_access_token_without_expire_time():
+def test_create_access_token_without_expire_time() -> None:
     start_datetime = datetime.now(timezone.utc)
 
     employee = Employee(
@@ -59,4 +59,4 @@ def test_create_access_token_without_expire_time():
     token_expire_dt = datetime.fromtimestamp(decoded["exp"], timezone.utc)
     diff = token_expire_dt - start_datetime
 
-    assert diff.total_seconds() == approx(15*60, rel=1e-2)
+    assert diff.total_seconds() == approx(15 * 60, rel=1e-2)

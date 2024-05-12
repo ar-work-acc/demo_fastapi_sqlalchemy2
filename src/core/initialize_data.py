@@ -20,18 +20,16 @@ logger = logging.getLogger(__name__)
 
 
 async def check_and_create_user(
-        session: AsyncSession,
-        first_name: str,
-        last_name: str,
-        email: str,
-        password: str,
-        is_manager: bool,
-        hire_date: date,
+    session: AsyncSession,
+    first_name: str,
+    last_name: str,
+    email: str,
+    password: str,
+    is_manager: bool,
+    hire_date: date,
 ):
     exists_criteria = (
-        select(Employee.employee_id)
-        .filter_by(email=email)
-        .exists()
+        select(Employee.employee_id).filter_by(email=email).exists()
     )
     stmt = select(exists_criteria)
     result = await session.scalar(stmt)
@@ -88,6 +86,7 @@ async def init_db(session: AsyncSession):
 async def start_async_session_to_run_async_function(func):
     async with AsyncSessionMaker() as session:
         await func(session)
+
 
 if __name__ == "__main__":
     asyncio.run(start_async_session_to_run_async_function(init_db))

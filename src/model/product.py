@@ -17,6 +17,7 @@ class ProductType(enum.Enum):
     The enumeration for our product types.
     Products are divided into: phone, accessory, and other types.
     """
+
     PHONE = 0
     ACCESSORY = 1
     OTHER = 2
@@ -29,7 +30,8 @@ class Product(Base, repr=False):  # type: ignore
 
     product_name: Mapped[str_255] = mapped_column(index=True)
     unit_price: Mapped[num_12_2] = mapped_column(
-        CheckConstraint("unit_price>0"))
+        CheckConstraint("unit_price>0")
+    )
     units_in_stock: Mapped[int] = mapped_column(
         CheckConstraint("units_in_stock>=0"),
         default=0,

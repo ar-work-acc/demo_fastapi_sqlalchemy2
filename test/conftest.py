@@ -1,4 +1,3 @@
-
 from collections.abc import AsyncGenerator
 
 import pytest
@@ -25,31 +24,31 @@ PRODUCT_DATA = [
         "product_name": "phone",
         "unit_price": 300.0,
         "units_in_stock": 5,
-        "type": 0
+        "type": 0,
     },
     {
         "product_name": "phone screen protector",
         "unit_price": 9.50,
         "units_in_stock": 10,
-        "type": 1
+        "type": 1,
     },
     {
         "product_name": "headphone",
         "unit_price": 25.99,
         "units_in_stock": 10,
-        "type": 2
+        "type": 2,
     },
     {
         "product_name": "digital camera",
         "unit_price": 45.99,
-        "units_in_stock": 5
+        "units_in_stock": 5,
     },
     {
         "product_name": "memory card 256GB",
         "unit_price": 21.99,
         "units_in_stock": 1,
-        "type": 1
-    }
+        "type": 1,
+    },
 ]
 
 

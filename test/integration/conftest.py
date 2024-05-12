@@ -57,7 +57,7 @@ async def get_auth_header(
     }
     response = await async_client.post("/api/v1/auth/login", data=form_data)
     token = response.json()["access_token"]
-    header = {'Authorization': f"Bearer {token}"}
+    header = {"Authorization": f"Bearer {token}"}
     return header
 
 

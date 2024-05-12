@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends
 
 import service.product as product_service
-from core.dependency import (AsyncSessionDep, check_logged_in_user_is_manager,
-                             oauth2_scheme)
+from core.dependency import (
+    AsyncSessionDep,
+    check_logged_in_user_is_manager,
+    oauth2_scheme,
+)
 from schema.product import ProductInput, ProductOutput
 
 router = APIRouter()

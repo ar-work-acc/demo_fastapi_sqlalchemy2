@@ -3,15 +3,14 @@ from datetime import datetime, timezone
 import pytest
 from fastapi import HTTPException
 from jose import jwt
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.auth import create_access_token
 from core.config import PROJECT_SETTINGS
 from core.dependency import get_current_user
-from model.employee import Employee
 from schema.user import User
 
 
-async def test_get_current_user_without_token(session):
+async def test_get_current_user_without_token(session: AsyncSession) -> None:
     with pytest.raises(HTTPException) as excinfo:
         await get_current_user("", session)
 
@@ -21,7 +20,10 @@ async def test_get_current_user_without_token(session):
 
 
 @pytest.mark.parametrize("username", ["", "non-existing-username"])
-async def test_get_current_user_with_nonexistent_user_name(username, session):
+async def test_get_current_user_with_nonexistent_user_name(
+    username: str,
+    session: AsyncSession,
+) -> None:
     user = User(
         sub=username,
         first_name="Test",
@@ -43,9 +45,9 @@ async def test_get_current_user_with_nonexistent_user_name(username, session):
 
 
 async def test_get_current_user_with_username_equaling_none(
-        session,
-        monkeypatch,
-):
+    session: AsyncSession,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     # use mocking to test such a situation
     def mock_decode(*args, **kwargs):
         return {"sub": None}

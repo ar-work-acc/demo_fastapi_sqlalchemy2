@@ -1,6 +1,7 @@
 """
 For dependency injection.
 """
+
 from typing import Annotated, AsyncGenerator
 
 from fastapi import Depends, HTTPException
@@ -26,8 +27,8 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def get_current_user(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        session: Annotated[AsyncSession, Depends(get_session)],
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Employee:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,7 +55,7 @@ async def get_current_user(
 
 
 def check_logged_in_user_is_manager(
-        token: Annotated[str, Depends(oauth2_scheme)]
+    token: Annotated[str, Depends(oauth2_scheme)]
 ) -> bool:
     """This DI function checks if the user is a manager; if not, raises an
     exception.

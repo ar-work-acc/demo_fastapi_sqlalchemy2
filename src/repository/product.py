@@ -25,11 +25,7 @@ async def get_products(
     order_by: str,
     direction: str,
 ):
-    stmt = (
-        select(Product)
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-    )
+    stmt = select(Product).offset((page - 1) * page_size).limit(page_size)
 
     if direction == "asc":
         stmt = stmt.order_by(order_by)
@@ -38,7 +34,7 @@ async def get_products(
     else:
         raise HTTPException(
             status_code=400,
-            detail='Use asc or desc for the direction parameter.',
+            detail="Use asc or desc for the direction parameter.",
         )
 
     products = (await session.scalars(stmt)).all()

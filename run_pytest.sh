@@ -1,7 +1,8 @@
 #!/bin/bash
-echo "Checking mypy issues ..."
+echo "*** Checking mypy issues ... ***"
 mypy test
 
+echo "*** Start running tests! ***"
 export ENVIRONMENT=test
 export DB_DATABASE=test
 export CORS_ORIGINS="http://localhost,http://meowfish.org,https://meowfish.org"

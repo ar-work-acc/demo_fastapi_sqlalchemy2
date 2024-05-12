@@ -4,11 +4,11 @@ from model.common import is_email_valid
 from model.employee import Employee
 
 
-def test_invalid_email():
+def test_invalid_email() -> None:
     assert is_email_valid("invalid_email") is False
 
 
-def test_employee_invalid_email():
+def test_employee_invalid_email() -> None:
     with pytest.raises(ValueError) as excinfo:
         Employee(
             email="invalid_email",

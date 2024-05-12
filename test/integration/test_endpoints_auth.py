@@ -67,9 +67,7 @@ async def test_user_login_failure() -> None:
         response = await ac.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 401
-    assert response.json() == {
-        "detail": "Incorrect username or password"
-    }
+    assert response.json() == {"detail": "Incorrect username or password"}
 
 
 async def test_unknown_user_login_failure() -> None:
@@ -84,14 +82,12 @@ async def test_unknown_user_login_failure() -> None:
         response = await ac.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 401
-    assert response.json() == {
-        "detail": "Incorrect username or password"
-    }
+    assert response.json() == {"detail": "Incorrect username or password"}
 
 
 async def test_get_employee_info(
-        async_client: AsyncClient,
-        auth_header_user: dict[str, str],
+    async_client: AsyncClient,
+    auth_header_user: dict[str, str],
 ) -> None:
     response = await async_client.get(
         "/api/v1/auth/employee-info",
@@ -104,13 +100,13 @@ async def test_get_employee_info(
         "email": "alice@meowfish.org",
         "first_name": "Alice",
         "last_name": "Maxwell",
-        "is_manager": False
+        "is_manager": False,
     }
 
 
 async def test_get_user_info(
-        async_client: AsyncClient,
-        auth_header_user: dict[str, str],
+    async_client: AsyncClient,
+    auth_header_user: dict[str, str],
 ) -> None:
     response = await async_client.get(
         "/api/v1/auth/user-info",

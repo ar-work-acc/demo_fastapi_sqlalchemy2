@@ -1,6 +1,7 @@
 """
 FastAPI main app.
 """
+
 from fastapi import APIRouter, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 

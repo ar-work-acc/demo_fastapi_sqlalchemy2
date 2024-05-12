@@ -2,15 +2,16 @@ import logging
 from datetime import date, timedelta
 
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import PROJECT_SETTINGS
 from core.initialize_data import check_and_create_user
 
 
 async def test_creating_duplicate_user(
-        session,
-        caplog: pytest.LogCaptureFixture,
-):
+    session: AsyncSession,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     caplog.set_level(logging.DEBUG)
 
     await check_and_create_user(
@@ -26,5 +27,7 @@ async def test_creating_duplicate_user(
     for record in caplog.records:
         assert record.levelname != "CRITICAL"
 
-    assert (f"User ({PROJECT_SETTINGS.ADMIN_USERNAME})"
-            " already exists! Skipping.") in caplog.text
+    assert (
+        f"User ({PROJECT_SETTINGS.ADMIN_USERNAME})"
+        " already exists! Skipping."
+    ) in caplog.text

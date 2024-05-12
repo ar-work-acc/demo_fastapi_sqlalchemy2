@@ -19,8 +19,8 @@ def get_password_hash(password: str) -> str:
         str: The bcrypt hash of the password.
     """
     salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed_password.decode('utf-8')
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
+    return hashed_password.decode("utf-8")
 
 
 def verify_password(password: str, hashed_password: str) -> bool:
@@ -35,14 +35,14 @@ def verify_password(password: str, hashed_password: str) -> bool:
         bool: True if the password matches the hash, False otherwise.
     """
     return bcrypt.checkpw(
-        password.encode('utf-8'),
-        hashed_password.encode('utf-8'),
+        password.encode("utf-8"),
+        hashed_password.encode("utf-8"),
     )
 
 
 def create_access_token(
-        employee: Employee,
-        expires_delta: timedelta | None = None,
+    employee: Employee,
+    expires_delta: timedelta | None = None,
 ):
     user = User(
         sub=employee.email,

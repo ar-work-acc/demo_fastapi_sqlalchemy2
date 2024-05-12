@@ -1,6 +1,7 @@
 """
 Database CRUD operations for FastAPI service.
 """
+
 import logging
 
 from sqlalchemy.ext.asyncio import AsyncSession

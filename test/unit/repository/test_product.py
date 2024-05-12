@@ -1,9 +1,13 @@
-from fastapi import HTTPException
 import pytest
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from repository.product import get_products
 
 
-async def test_get_products_with_wrong_direction(session):
+async def test_get_products_with_wrong_direction(
+    session: AsyncSession,
+) -> None:
     with pytest.raises(HTTPException) as excinfo:
         await get_products(
             session,
@@ -15,12 +19,11 @@ async def test_get_products_with_wrong_direction(session):
 
     assert excinfo.value.status_code == 400
     assert excinfo.value.detail == (
-        'Use asc or desc '
-        'for the direction parameter.'
+        "Use asc or desc " "for the direction parameter."
     )
 
 
-async def test_get_products_asc(session):
+async def test_get_products_asc(session: AsyncSession) -> None:
     products = await get_products(
         session,
         page=1,

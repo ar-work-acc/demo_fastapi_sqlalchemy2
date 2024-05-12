@@ -9,6 +9,7 @@ class User(BaseModel):
     sub: subject,
     exp: expiration time,
     """
+
     sub: str  # same as email here
     exp: datetime
 

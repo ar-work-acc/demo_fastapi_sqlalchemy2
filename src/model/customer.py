@@ -29,9 +29,7 @@ class Customer(EmailValidatorMixin, Base):
 
     order_count: Mapped[int] = query_expression(repr=False)
 
-    __table_args__ = (
-        Index("customer_full_name", "first_name", "last_name"),
-    )
+    __table_args__ = (Index("customer_full_name", "first_name", "last_name"),)
 
     # same with lazily loaded relationships, you can use:
     # `await customer.awaitable_attrs.orders`

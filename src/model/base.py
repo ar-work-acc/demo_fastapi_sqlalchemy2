@@ -27,12 +27,13 @@ AsyncSessionMaker = async_sessionmaker(
 )
 
 
-class Base(AsyncAttrs, MappedAsDataclass,  DeclarativeBase):
+class Base(AsyncAttrs, MappedAsDataclass, DeclarativeBase):
     """
     Declarative base with Python dataclass integration.
 
     AsyncAttrs: to "await" for lazy loaded attributes
     """
+
     pass
 
 
@@ -41,13 +42,13 @@ int_pk = Annotated[
     int,
     mapped_column(
         primary_key=True,
-    )
+    ),
 ]
 date_auto = Annotated[
     datetime.date,
     mapped_column(
         default=datetime.date.today,
-    )
+    ),
 ]
 timestamp_auto = Annotated[
     datetime.datetime,
@@ -59,17 +60,17 @@ str_127 = Annotated[
     str,
     mapped_column(
         String(127),
-    )
+    ),
 ]
 str_255 = Annotated[
     str,
     mapped_column(
         String(255),
-    )
+    ),
 ]
 num_12_2 = Annotated[
     Decimal,
     mapped_column(
         Numeric(12, 2),
-    )
+    ),
 ]

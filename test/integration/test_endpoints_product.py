@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 async def test_admin_create_product(
-        async_client: AsyncClient,
-        auth_header_admin: dict[str, str],
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
 ) -> None:
     data = {
         "product_name": "test phone",
         "unit_price": 100.0,
         "units_in_stock": 5,
-        "type": ProductType.PHONE.value
+        "type": ProductType.PHONE.value,
     }
     response = await async_client.post(
         "/api/v1/products/",
@@ -52,19 +52,19 @@ async def test_user_get_product_detail(
     x = PRODUCT_DATA[product_id - 1]
     x["product_id"] = product_id
     x["product_name"] = str(x["product_name"]).title()
-    x["unit_price"] = '{:.2f}'.format(float(str(x["unit_price"])))
+    x["unit_price"] = "{:.2f}".format(float(str(x["unit_price"])))
     assert response.json() == x
 
 
 async def test_user_create_product_failure(
-        async_client: AsyncClient,
-        auth_header_user: dict[str, str],
+    async_client: AsyncClient,
+    auth_header_user: dict[str, str],
 ) -> None:
     data = {
         "product_name": "test user product",
         "unit_price": 100.0,
         "units_in_stock": 5,
-        "type": ProductType.PHONE.value
+        "type": ProductType.PHONE.value,
     }
 
     response = await async_client.post(
@@ -80,7 +80,7 @@ async def test_user_create_product_failure(
 
 
 async def test_get_product_pages(
-        async_client: AsyncClient,
+    async_client: AsyncClient,
 ) -> None:
 
     async def get_page(page_number: int = 1):

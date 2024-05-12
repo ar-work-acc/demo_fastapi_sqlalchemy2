@@ -16,6 +16,7 @@ class OrderDetail(Base):
     Association object pattern.
     This uses the associative table between Order and Product.
     """
+
     __tablename__ = "order_detail"
 
     order_id: Mapped[int] = mapped_column(
