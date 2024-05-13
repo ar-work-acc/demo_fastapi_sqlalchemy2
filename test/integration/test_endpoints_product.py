@@ -23,6 +23,7 @@ async def test_admin_create_product(
         headers=auth_header_admin,
         json=data,
     )
+
     assert response.status_code == 201
 
     json_result = response.json()
@@ -54,6 +55,22 @@ async def test_user_get_product_detail(
     x["product_name"] = str(x["product_name"]).title()
     x["unit_price"] = "{:.2f}".format(float(str(x["unit_price"])))
     assert response.json() == x
+
+
+async def test_user_get_non_existing_product_detail(
+    async_client: AsyncClient,
+    auth_header_user: dict[str, str],
+) -> None:
+    product_id = 1_000_000
+    response = await async_client.get(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_user,
+    )
+
+    assert response.status_code == 404
+
+    json_response = response.json()
+    assert json_response["detail"] == f"Product #{product_id} not found!"
 
 
 async def test_user_create_product_failure(

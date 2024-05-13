@@ -4,6 +4,7 @@ Database CRUD operations for FastAPI service.
 
 import logging
 
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import repository.product as product_repo
@@ -39,6 +40,11 @@ async def get_product(
         # without explicitly loading it first
         # (try and comment out the above)
         logger.debug(f"product.orders: {product.orders}")
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Product #{product_id} not found!",
+        )
 
     return product
 

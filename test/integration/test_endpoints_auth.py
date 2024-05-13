@@ -19,16 +19,12 @@ async def test_root(async_client: AsyncClient) -> None:
     }
 
 
-async def test_admin_login() -> None:
+async def test_admin_login(async_client: AsyncClient) -> None:
     form_data = {
         "username": PROJECT_SETTINGS.ADMIN_USERNAME,
         "password": PROJECT_SETTINGS.ADMIN_PASSWORD,
     }
-    async with AsyncClient(
-        app=app,
-        base_url=BASE_URL,
-    ) as ac:
-        response = await ac.post("/api/v1/auth/login", data=form_data)
+    response = await async_client.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 200
 
@@ -37,16 +33,12 @@ async def test_admin_login() -> None:
     assert "access_token" in json_result
 
 
-async def test_user_login() -> None:
+async def test_user_login(async_client: AsyncClient) -> None:
     form_data = {
         "username": PROJECT_SETTINGS.USER_USERNAME,
         "password": PROJECT_SETTINGS.USER_PASSWORD,
     }
-    async with AsyncClient(
-        app=app,
-        base_url=BASE_URL,
-    ) as ac:
-        response = await ac.post("/api/v1/auth/login", data=form_data)
+    response = await async_client.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 200
 
@@ -55,31 +47,23 @@ async def test_user_login() -> None:
     assert "access_token" in json_result
 
 
-async def test_user_login_failure() -> None:
+async def test_user_login_failure(async_client: AsyncClient) -> None:
     form_data = {
         "username": PROJECT_SETTINGS.USER_USERNAME,
         "password": "x",
     }
-    async with AsyncClient(
-        app=app,
-        base_url=BASE_URL,
-    ) as ac:
-        response = await ac.post("/api/v1/auth/login", data=form_data)
+    response = await async_client.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 401
     assert response.json() == {"detail": "Incorrect username or password"}
 
 
-async def test_unknown_user_login_failure() -> None:
+async def test_unknown_user_login_failure(async_client: AsyncClient) -> None:
     form_data = {
         "username": "unknown",
         "password": "x",
     }
-    async with AsyncClient(
-        app=app,
-        base_url=BASE_URL,
-    ) as ac:
-        response = await ac.post("/api/v1/auth/login", data=form_data)
+    response = await async_client.post("/api/v1/auth/login", data=form_data)
 
     assert response.status_code == 401
     assert response.json() == {"detail": "Incorrect username or password"}
