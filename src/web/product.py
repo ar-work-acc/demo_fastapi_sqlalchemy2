@@ -84,3 +84,21 @@ async def get_products(
         order_by,
         direction,
     )
+
+
+@router.delete(
+    "/{product_id}",
+    status_code=204,
+    dependencies=[Depends(check_logged_in_user_is_manager)],
+)
+async def delete_product(
+    session: AsyncSessionDep,
+    product_id: int,
+):
+    """An endpoint to delete products. Only managers can access this endpoint.
+
+    Args:
+        session (AsyncSessionDep): DI injected async session object.
+        product_id (int): The product's primary key.
+    """
+    await product_service.delete_product(session, product_id)

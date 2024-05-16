@@ -40,3 +40,19 @@ async def get_products(
     products = (await session.scalars(stmt)).all()
 
     return products
+
+
+async def delete_product(
+    session: AsyncSession,
+    product_id: int,
+):
+    product = await session.get(Product, product_id)
+
+    if product is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Product #{product_id} not found! Cannot delete product.",
+        )
+
+    await session.delete(product)
+    await session.commit()

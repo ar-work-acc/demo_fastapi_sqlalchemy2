@@ -63,3 +63,10 @@ async def get_products(
         order_by,
         direction,
     )
+
+
+async def delete_product(
+    session: AsyncSession,
+    product_id: int,
+):
+    await product_repo.delete_product(session, product_id)

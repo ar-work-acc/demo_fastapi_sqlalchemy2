@@ -1,9 +1,14 @@
+from decimal import Decimal
 import logging
+from schema.product import ProductInput
 from test.conftest import PRODUCT_DATA
 
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from model import ProductType
+from repository import product as product_repo
+from test.integration import UNAUTHORIZED_RESPONSE
 
 logger = logging.getLogger(__name__)
 
@@ -91,9 +96,7 @@ async def test_user_create_product_failure(
     )
 
     assert response.status_code == 403
-    assert response.json() == {
-        "detail": "Unauthorized. Only managers can access this endpoint."
-    }
+    assert response.json() == UNAUTHORIZED_RESPONSE
 
 
 async def test_get_product_pages(
@@ -129,3 +132,53 @@ async def test_get_product_pages(
 
     # page, order_by, direction
     assert product_id_11 > product_id_12 > product_id_21 > product_id_22
+
+
+async def test_admin_delete_product(
+    session: AsyncSession,
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
+) -> None:
+    product = await product_repo.create_product(
+        session,
+        ProductInput(
+            product_name="test product",
+            unit_price=Decimal(1),
+        ),
+    )
+    assert product is not None
+
+    product_id = product.product_id
+    response = await async_client.delete(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_admin,
+    )
+    assert response.status_code == 204
+
+
+async def test_admin_delete_non_existing_product(
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
+) -> None:
+    product_id = 1_000_000
+    response = await async_client.delete(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_admin,
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": f"Product #{product_id} not found! Cannot delete product."
+    }
+
+
+async def test_user_delete_product_failure(
+    async_client: AsyncClient,
+    auth_header_user: dict[str, str],
+) -> None:
+    product_id = 1
+    response = await async_client.delete(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_user,
+    )
+    assert response.status_code == 403
+    assert response.json() == UNAUTHORIZED_RESPONSE
