@@ -1,6 +1,6 @@
 #!/bin/bash
 # echo "*** Checking mypy issues ... ***"
-# mypy test
+# mypy --disallow-untyped-defs src test
 
 echo "*** Start running tests! ***"
 export ENVIRONMENT=test

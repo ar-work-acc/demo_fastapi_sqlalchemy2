@@ -43,7 +43,7 @@ def verify_password(password: str, hashed_password: str) -> bool:
 def create_access_token(
     employee: Employee,
     expires_delta: timedelta | None = None,
-):
+) -> str:
     user = User(
         sub=employee.email,
         first_name=employee.first_name,

@@ -2,6 +2,7 @@
 Database CRUD operations for FastAPI service.
 """
 
+from collections.abc import Sequence
 import logging
 
 from fastapi import HTTPException
@@ -56,7 +57,7 @@ async def get_products(
     page_size: int,
     order_by: str,
     direction: str,
-) -> list[Product]:
+) -> Sequence[Product]:
     return await product_repo.get_products(
         session,
         page,

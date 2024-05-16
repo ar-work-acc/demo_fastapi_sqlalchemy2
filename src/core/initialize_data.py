@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from datetime import date, timedelta
+from typing import Callable
 
 from sqlalchemy import Engine, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +28,7 @@ async def check_and_create_user(
     password: str,
     is_manager: bool,
     hire_date: date,
-):
+) -> None:
     exists_criteria = (
         select(Employee.employee_id).filter_by(email=email).exists()
     )
@@ -51,7 +52,7 @@ async def check_and_create_user(
         await session.commit()
 
 
-async def init_db(session: AsyncSession):
+async def init_db(session: AsyncSession) -> None:
     """Initialize the database with two users:
     one manager (admin) and one normal user.
     """
@@ -83,7 +84,7 @@ async def init_db(session: AsyncSession):
     )
 
 
-async def start_async_session_to_run_async_function(func):
+async def start_async_session_to_run_async_function(func: Callable) -> None:
     async with AsyncSessionMaker() as session:
         await func(session)
 

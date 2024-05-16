@@ -37,7 +37,7 @@ app.include_router(api_v1_router, prefix=PROJECT_SETTINGS.API_V1_PATH)
 
 
 @app.get("/")
-async def root():
+async def root() -> dict[str, str]:
     """Root endpoint for the demo project.
 
     Returns:

@@ -1,7 +1,7 @@
 from __future__ import annotations  # PEP-563
 
 import enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
@@ -67,5 +67,5 @@ class Product(Base, repr=False):  # type: ignore
         )
 
     @validates("product_name")
-    def validate_product_name(self, key, value: str):
+    def validate_product_name(self, key: Any, value: str) -> str:
         return value.title()

@@ -10,7 +10,7 @@ import service.auth as auth_service
 from core.auth import create_access_token
 from core.config import PROJECT_SETTINGS
 from core.dependency import AsyncSessionDep, CurrentUserDep, TokenDep
-from model import Employee
+from model.employee import Employee
 from schema.employee import EmployeeBase
 from schema.token import Token
 
@@ -63,7 +63,7 @@ async def login(
 @router.get("/employee-info", response_model=EmployeeBase)
 async def get_employee_info(
     employee: CurrentUserDep,
-):
+) -> Employee:
     """For a logged in user with a JWT token, query the database
     for employee info.
 

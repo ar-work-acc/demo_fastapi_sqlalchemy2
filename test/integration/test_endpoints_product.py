@@ -3,7 +3,7 @@ from decimal import Decimal
 from test.conftest import PRODUCT_DATA
 from test.integration import NON_EXISTING_PRODUCT_ID, UNAUTHORIZED_RESPONSE
 
-from httpx import AsyncClient
+from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from model import ProductType
@@ -103,7 +103,7 @@ async def test_get_product_pages(
     async_client: AsyncClient,
 ) -> None:
 
-    async def get_page(page_number: int = 1):
+    async def get_page(page_number: int = 1) -> Response:
         params = {
             "page": str(page_number),
             "page_size": str(2),

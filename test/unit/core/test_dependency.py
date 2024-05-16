@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Any
 
 import pytest
 from fastapi import HTTPException
@@ -49,7 +50,7 @@ async def test_get_current_user_with_username_equaling_none(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # use mocking to test such a situation
-    def mock_decode(*args, **kwargs):
+    def mock_decode(*args: Any, **kwargs: Any) -> dict[str, None]:
         return {"sub": None}
 
     monkeypatch.setattr(

@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from fastapi import APIRouter, Depends
 
 import service.product as product_service
@@ -60,7 +62,7 @@ async def get_products(
     page_size: int = 3,
     order_by: str = "product_id",
     direction: str = "asc",
-) -> list[Product]:
+) -> Sequence[Product]:
     """Get a page of products (pagination).
 
     Args:
