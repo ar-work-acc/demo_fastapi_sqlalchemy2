@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import repository.product as product_repo
+from model.product import Product
 from schema.product import ProductInput
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 async def create_product(
     session: AsyncSession,
     product: ProductInput,
-):
+) -> Product:
     db_product = await product_repo.create_product(session, product)
 
     # test: try and comment out `expire_on_commit=False`
@@ -28,7 +29,7 @@ async def create_product(
 async def get_product(
     session: AsyncSession,
     product_id: int,
-):
+) -> Product:
     product = await product_repo.get_product(session, product_id)
 
     if product is not None:
@@ -55,7 +56,7 @@ async def get_products(
     page_size: int,
     order_by: str,
     direction: str,
-):
+) -> list[Product]:
     return await product_repo.get_products(
         session,
         page,
@@ -65,8 +66,20 @@ async def get_products(
     )
 
 
+async def update_product(
+    session: AsyncSession,
+    product_id: int,
+    product_data: ProductInput,
+) -> Product:
+    return await product_repo.update_product(
+        session,
+        product_id,
+        product_data,
+    )
+
+
 async def delete_product(
     session: AsyncSession,
     product_id: int,
-):
+) -> None:
     await product_repo.delete_product(session, product_id)

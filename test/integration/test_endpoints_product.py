@@ -1,14 +1,14 @@
-from decimal import Decimal
 import logging
-from schema.product import ProductInput
+from decimal import Decimal
 from test.conftest import PRODUCT_DATA
+from test.integration import NON_EXISTING_PRODUCT_ID, UNAUTHORIZED_RESPONSE
 
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from model import ProductType
 from repository import product as product_repo
-from test.integration import UNAUTHORIZED_RESPONSE
+from schema.product import ProductInput
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ async def test_user_get_non_existing_product_detail(
     async_client: AsyncClient,
     auth_header_user: dict[str, str],
 ) -> None:
-    product_id = 1_000_000
+    product_id = NON_EXISTING_PRODUCT_ID
     response = await async_client.get(
         f"/api/v1/products/{product_id}",
         headers=auth_header_user,
@@ -160,7 +160,7 @@ async def test_admin_delete_non_existing_product(
     async_client: AsyncClient,
     auth_header_admin: dict[str, str],
 ) -> None:
-    product_id = 1_000_000
+    product_id = NON_EXISTING_PRODUCT_ID
     response = await async_client.delete(
         f"/api/v1/products/{product_id}",
         headers=auth_header_admin,
@@ -182,3 +182,64 @@ async def test_user_delete_product_failure(
     )
     assert response.status_code == 403
     assert response.json() == UNAUTHORIZED_RESPONSE
+
+
+async def test_admin_update_product(
+    session: AsyncSession,
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
+) -> None:
+    # create a product for update
+    product = await product_repo.create_product(
+        session,
+        ProductInput(
+            product_name="test product",
+            unit_price=Decimal(1),
+        ),
+    )
+    assert product is not None
+
+    # next, update this product with the following
+    product_id = product.product_id
+    data = {
+        "product_name": "test update",
+        "unit_price": 999,
+        "units_in_stock": 999,
+        "type": ProductType.PHONE.value,
+    }
+    response = await async_client.put(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_admin,
+        json=data,
+    )
+
+    assert response.status_code == 200
+
+    json_result = response.json()
+    assert json_result["product_id"] == product_id
+    assert json_result["product_name"] == "Test Update"  # CamelCase
+    assert json_result["unit_price"] == "999.00"  # scale: 2 (Pandoc)
+    assert json_result["units_in_stock"] == 999
+    assert json_result["type"] == ProductType.PHONE.value
+
+
+async def test_admin_update_non_existing_product(
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
+) -> None:
+    product_id = NON_EXISTING_PRODUCT_ID
+    data = {
+        "product_name": "test update",
+        "unit_price": 999,
+        "units_in_stock": 999,
+        "type": ProductType.PHONE.value,
+    }
+    response = await async_client.put(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_admin,
+        json=data,
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": f"Product #{product_id} not found! Aborting the update."
+    }

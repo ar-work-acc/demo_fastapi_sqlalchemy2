@@ -15,14 +15,14 @@ class ProductBase(BaseModel):
     Common base model for creating and reading data.
     """
 
-    product_name: str
+    product_name: str = ""
     unit_price: Annotated[
         Decimal,
         # https://docs.pydantic.dev/latest/api/standard_library_types/#decimaldecimal
         PlainSerializer(
             lambda x: round(x, 2), return_type=Decimal, when_used="json"
         ),
-    ]
+    ] = Decimal(0)
     units_in_stock: int = 0
     type: ProductType = ProductType.OTHER
 

@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Depends
 
 import service.product as product_service
-from core.dependency import (
-    AsyncSessionDep,
-    check_logged_in_user_is_manager,
-    oauth2_scheme,
-)
+from core.dependency import (AsyncSessionDep, check_logged_in_user_is_manager,
+                             oauth2_scheme)
+from model.product import Product
 from schema.product import ProductInput, ProductOutput
 
 router = APIRouter()
@@ -20,7 +18,7 @@ router = APIRouter()
 async def create_product(
     product: ProductInput,
     session: AsyncSessionDep,
-) -> ProductOutput:
+) -> Product:
     """An endpoint to create products. Only managers can access this endpoint.
 
     Args:
@@ -41,7 +39,7 @@ async def create_product(
 async def get_product(
     product_id: int,
     session: AsyncSessionDep,
-) -> ProductOutput:
+) -> Product:
     """Get the product detail of a product by its id.
     Only logged in users can access this endpoint.
 
@@ -62,7 +60,7 @@ async def get_products(
     page_size: int = 3,
     order_by: str = "product_id",
     direction: str = "asc",
-) -> list[ProductOutput]:
+) -> list[Product]:
     """Get a page of products (pagination).
 
     Args:
@@ -86,6 +84,33 @@ async def get_products(
     )
 
 
+@router.put(
+    "/{product_id}",
+    dependencies=[Depends(check_logged_in_user_is_manager)],
+    response_model=ProductOutput,
+)
+async def update_product(
+    session: AsyncSessionDep,
+    product_id: int,
+    product_data: ProductInput,
+) -> Product:
+    """An endpoint to update products. Only managers can access this endpoint.
+
+    Args:
+        session (AsyncSessionDep): Injected async session object.
+        product_id (int): product primary key
+        product_data (ProductInput): The product input model (fields to update)
+
+    Returns:
+        _type_: _description_
+    """
+    product = await product_service.update_product(
+        session, product_id, product_data
+    )
+
+    return product
+
+
 @router.delete(
     "/{product_id}",
     status_code=204,
@@ -94,7 +119,7 @@ async def get_products(
 async def delete_product(
     session: AsyncSessionDep,
     product_id: int,
-):
+) -> None:
     """An endpoint to delete products. Only managers can access this endpoint.
 
     Args:
