@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.initialize_data import init_db
 from model import AsyncSessionMaker, Base, engine
 from repository.product import create_product
-from schema.product import ProductInput
+from schema.product import ProductCreate
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -42,6 +42,7 @@ PRODUCT_DATA = [
         "product_name": "digital camera",
         "unit_price": 45.99,
         "units_in_stock": 5,
+        "type": 2,
     },
     {
         "product_name": "memory card 256GB",
@@ -71,7 +72,7 @@ async def session() -> AsyncGenerator[AsyncSession, None]:
 
         # create some products
         for data in PRODUCT_DATA:
-            await create_product(session, ProductInput.model_validate(data))
+            await create_product(session, ProductCreate.model_validate(data))
 
         yield session
         # clean up code

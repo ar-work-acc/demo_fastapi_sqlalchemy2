@@ -5,11 +5,11 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from model.product import Product
-from schema.product import ProductInput
+from schema.product import ProductCreate, ProductUpdate
 
 
 async def create_product(
-    session: AsyncSession, product: ProductInput
+    session: AsyncSession, product: ProductCreate
 ) -> Product:
     db_product = Product(**product.model_dump())
     session.add(db_product)
@@ -51,7 +51,7 @@ async def get_products(
 async def update_product(
     session: AsyncSession,
     product_id: int,
-    product_data: ProductInput,
+    product_data: ProductUpdate,
 ) -> Product:
     # check if the model exists in the database
     product = await session.get(Product, product_id)
@@ -61,8 +61,8 @@ async def update_product(
             detail=f"Product #{product_id} not found! Aborting the update.",
         )
 
-    # if it does, update its attributes with values from the Pandoc model
-    for key, value in product_data.model_dump().items():
+    # if it does, update its attributes with values from the Pydantic model
+    for key, value in product_data.model_dump(exclude_none=True).items():
         setattr(product, key, value)
     await session.commit()
 

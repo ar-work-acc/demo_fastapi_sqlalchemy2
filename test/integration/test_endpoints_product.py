@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from model import ProductType
 from repository import product as product_repo
-from schema.product import ProductInput
+from schema.product import ProductCreate
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +141,7 @@ async def test_admin_delete_product(
 ) -> None:
     product = await product_repo.create_product(
         session,
-        ProductInput(
+        ProductCreate(
             product_name="test product",
             unit_price=Decimal(1),
         ),
@@ -192,7 +192,7 @@ async def test_admin_update_product(
     # create a product for update
     product = await product_repo.create_product(
         session,
-        ProductInput(
+        ProductCreate(
             product_name="test product",
             unit_price=Decimal(1),
         ),
@@ -220,6 +220,43 @@ async def test_admin_update_product(
     assert json_result["product_name"] == "Test Update"  # CamelCase
     assert json_result["unit_price"] == "999.00"  # scale: 2 (Pandoc)
     assert json_result["units_in_stock"] == 999
+    assert json_result["type"] == ProductType.PHONE.value
+
+
+async def test_admin_update_product_units_in_stock(
+    session: AsyncSession,
+    async_client: AsyncClient,
+    auth_header_admin: dict[str, str],
+) -> None:
+    # create a product for update
+    product = await product_repo.create_product(
+        session,
+        ProductCreate(
+            product_name="test phone",
+            unit_price=Decimal(100),
+            type=ProductType.PHONE,
+        ),
+    )
+    assert product is not None
+
+    # next, update this product's units in stock
+    product_id = product.product_id
+    data = {
+        "units_in_stock": 20,
+    }
+    response = await async_client.put(
+        f"/api/v1/products/{product_id}",
+        headers=auth_header_admin,
+        json=data,
+    )
+
+    assert response.status_code == 200
+
+    json_result = response.json()
+    assert json_result["product_id"] == product_id
+    assert json_result["product_name"] == "Test Phone"  # CamelCase
+    assert json_result["unit_price"] == "100.00"  # scale: 2
+    assert json_result["units_in_stock"] == 20
     assert json_result["type"] == ProductType.PHONE.value
 
 

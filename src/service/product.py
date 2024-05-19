@@ -2,22 +2,22 @@
 Database CRUD operations for FastAPI service.
 """
 
-from collections.abc import Sequence
 import logging
+from collections.abc import Sequence
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import repository.product as product_repo
 from model.product import Product
-from schema.product import ProductInput
+from schema.product import ProductCreate, ProductUpdate
 
 logger = logging.getLogger(__name__)
 
 
 async def create_product(
     session: AsyncSession,
-    product: ProductInput,
+    product: ProductCreate,
 ) -> Product:
     db_product = await product_repo.create_product(session, product)
 
@@ -70,7 +70,7 @@ async def get_products(
 async def update_product(
     session: AsyncSession,
     product_id: int,
-    product_data: ProductInput,
+    product_data: ProductUpdate,
 ) -> Product:
     return await product_repo.update_product(
         session,

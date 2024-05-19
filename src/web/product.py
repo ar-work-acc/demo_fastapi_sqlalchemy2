@@ -6,7 +6,7 @@ import service.product as product_service
 from core.dependency import (AsyncSessionDep, check_logged_in_user_is_manager,
                              oauth2_scheme)
 from model.product import Product
-from schema.product import ProductInput, ProductOutput
+from schema.product import ProductCreate, ProductOutput, ProductUpdate
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ router = APIRouter()
     dependencies=[Depends(check_logged_in_user_is_manager)],
 )
 async def create_product(
-    product: ProductInput,
+    product: ProductCreate,
     session: AsyncSessionDep,
 ) -> Product:
     """An endpoint to create products. Only managers can access this endpoint.
@@ -94,7 +94,7 @@ async def get_products(
 async def update_product(
     session: AsyncSessionDep,
     product_id: int,
-    product_data: ProductInput,
+    product_data: ProductUpdate,
 ) -> Product:
     """An endpoint to update products. Only managers can access this endpoint.
 
