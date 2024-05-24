@@ -1,10 +1,14 @@
 from collections.abc import Sequence
+from typing import Any
 
 from fastapi import APIRouter, Depends
 
 import service.product as product_service
-from core.dependency import (AsyncSessionDep, check_logged_in_user_is_manager,
-                             oauth2_scheme)
+from core.dependency import (
+    AsyncSessionDep,
+    check_logged_in_user_is_manager,
+    oauth2_scheme,
+)
 from model.product import Product
 from schema.product import ProductCreate, ProductOutput, ProductUpdate
 
@@ -14,13 +18,13 @@ router = APIRouter()
 @router.post(
     "/",
     status_code=201,
-    response_model=ProductOutput,
+    response_model=dict[str, ProductOutput | str],
     dependencies=[Depends(check_logged_in_user_is_manager)],
 )
 async def create_product(
     product: ProductCreate,
     session: AsyncSessionDep,
-) -> Product:
+) -> dict[str, Any]:
     """An endpoint to create products. Only managers can access this endpoint.
 
     Args:
@@ -30,7 +34,14 @@ async def create_product(
     Returns:
         ProductOutput: The Pydantic output model of the product just created.
     """
-    return await product_service.create_product(session, product)
+    db_product, task_id = await product_service.create_product(
+        session,
+        product,
+    )
+    return {
+        "product": db_product,
+        "task_id": task_id,  # pass back to client for later querying
+    }
 
 
 @router.get(

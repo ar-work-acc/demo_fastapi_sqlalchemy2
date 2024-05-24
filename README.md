@@ -5,6 +5,37 @@ template for your project. ASGI is used, so you should use asynchronous settings
 in Alembic (initialization and database URLs), and also in the database URLs in
 Python code (asyncpg).
 
+Note: Celery is added for demonstrating its usage, but it does not work well
+with asynchronous code and should be replaced with other services.
+
+## Running the Application (Summary)
+
+To start your app, run:
+
+```bash
+cd src
+alembic upgrade head  # create tables
+python -m core.initialize_data  # add initial users
+
+uvicorn main:app --reload  # start FastAPI app
+```
+
+Starting/stopping Celery:
+
+```bash
+./celery.sh start  # start Celery workers
+./celery.sh stop  # stop workers
+```
+
+Run tests:
+
+```bash
+./run_pytest.sh
+```
+
+You can access the FastAPI Swagger UI page at
+[http://localhost:8000/docs](http://localhost:8000/docs).
+
 ## Dependencies
 
 Install required packages (`fastapi[all]` includes uvicorn):
@@ -48,18 +79,6 @@ python_version = 3.11
 plugins = sqlalchemy.ext.mypy.plugin
 mypy_path = src/
 ```
-
-## Run
-
-To start your app, run:
-
-```bash
-cd src
-uvicorn main:app --reload
-```
-
-You can access the FastAPI Swagger UI page at
-[http://localhost:8000/docs](http://localhost:8000/docs).
 
 ## Endpoints
 
@@ -140,6 +159,18 @@ first (you can initialize "dev" and rename it to "prod").
 
 Logs are written to "pytest.log"; you can adjust the settings in "pytest.ini".
 
+To run all tests:
+
+```bash
+./run_pytest.sh
+```
+
+Or to run specific tests:
+
+```bash
+./run_pytest.sh -k <your_condition>
+```
+
 ## Coverage problems
 
 SQLAlchemy uses Greenlet, and FastAPI uses threads when using synchronous
@@ -162,7 +193,81 @@ exclude_also =
     if __name__ == "__main__":
 ```
 
-## TODO
+## Celery & Redis
 
-1. Full documentation for Swagger UI.
-2. CORS
+Note: For better async support, you should check other available options (e.g.,
+[FastAPI background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/)).
+Celery by default is not designed to be used with async operations.
+
+[Install the packages first](https://docs.celeryq.dev/en/stable/userguide/configuration.html#conf-redis-result-backend):
+
+```bash
+pip install celery[redis]
+```
+
+Update Redis CLI to the latest version (or you can't use the `-u` URI option):
+
+```bash
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+cd redis-stable
+make redis-cli
+sudo cp src/redis-cli /usr/local/bin/
+```
+
+Using the URI
+[`redis://user:password@host:port/dbnum`](https://docs.celeryq.dev/en/stable/userguide/configuration.html#conf-redis-result-backend)
+to connect to Redis:
+
+```bash
+$ redis-cli -u redis://admin:pw2024@localhost:6379/0
+localhost:6379> ping
+PONG
+```
+
+Using
+[`AUTH username password`](https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/):
+to authenticate instead:
+
+```bash
+$ redis-cli
+127.0.0.1:6379> ping
+(error) NOAUTH Authentication required.
+127.0.0.1:6379> AUTH admin pw2024
+OK
+127.0.0.1:6379> ping
+PONG
+```
+
+Or simply specify the username and password in command line arguments:
+
+```bash
+redis-cli --user admin --pass pw2024
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+127.0.0.1:6379> ping
+PONG
+```
+
+Note: Mocking is used for Celery task tests, so you don't need to start any
+worker for the tests.
+
+### Starting and Stopping Celery
+
+Use the script to start and stop Celery:
+
+```bash
+./celery.sh start
+./celery.sh stop
+```
+
+### Starting a Worker
+
+Run:
+
+```bash
+cd src
+celery -A task_queue.tasks worker -Q default --loglevel=DEBUG
+```
+
+Note: For more complex routing, see
+[Routing Tasks](https://docs.celeryq.dev/en/stable/userguide/routing.html)

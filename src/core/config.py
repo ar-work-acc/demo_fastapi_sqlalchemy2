@@ -36,8 +36,9 @@ class Settings(BaseSettings):
 
     # Database URL: "postgresql+asyncpg://postgres:pw2023@localhost:5432/shop"
     DB_SCHEME: str = "postgresql+asyncpg"
+    DB_SCHEME_SYNC: str = "postgresql+psycopg2"  # Celery, bad
     DB_USER: str = "postgres"
-    DB_PASSWORD: str = "pw2023"
+    DB_PASSWORD: str = ""
     DB_SERVER: str = "localhost"
     DB_PORT: int = 5432
     DB_DATABASE: str = "shop"
@@ -54,15 +55,59 @@ class Settings(BaseSettings):
             path=self.DB_DATABASE,
         )
 
+    @computed_field  # type: ignore[misc]
+    @property
+    def SQLALCHEMY_DATABASE_URL_SYNC(self) -> MultiHostUrl:
+        return MultiHostUrl.build(
+            scheme=self.DB_SCHEME_SYNC,
+            username=self.DB_USER,
+            password=self.DB_PASSWORD,
+            host=self.DB_SERVER,
+            port=self.DB_PORT,
+            path=self.DB_DATABASE,
+        )
+
     ADMIN_USERNAME: str = "admin@meowfish.org"
     ADMIN_PASSWORD: str = "pw2023"
 
-    USER_USERNAME: str = "alice@meowfish.org"
-    USER_PASSWORD: str = "maxwell"
+    USER_USERNAME: str = ""
+    USER_PASSWORD: str = ""
 
     CORS_ORIGINS: Annotated[
         list[AnyUrl] | str, BeforeValidator(parse_cors)
     ] = []
+
+    BROKER: str = "redis"
+    REDIS_USERNAME: str = ""
+    REDIS_PASSWORD: str = ""
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB_BROKER: int = 0
+    REDIS_DB_RESULT_BACKEND: int = 1
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def CELERY_BROKER_URL(self) -> MultiHostUrl:
+        return MultiHostUrl.build(
+            scheme=self.BROKER,
+            username=self.REDIS_USERNAME,
+            password=self.REDIS_PASSWORD,
+            host=self.REDIS_HOST,
+            port=self.REDIS_PORT,
+            path=str(self.REDIS_DB_BROKER),
+        )
+
+    @computed_field  # type: ignore[misc]
+    @property
+    def CELERY_BACKEND(self) -> MultiHostUrl:
+        return MultiHostUrl.build(
+            scheme=self.BROKER,
+            username=self.REDIS_USERNAME,
+            password=self.REDIS_PASSWORD,
+            host=self.REDIS_HOST,
+            port=self.REDIS_PORT,
+            path=str(self.REDIS_DB_RESULT_BACKEND),
+        )
 
 
 # use camel-case so VSCode can index for auto import

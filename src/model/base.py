@@ -5,8 +5,11 @@ from decimal import Decimal
 from typing import Annotated
 
 from sqlalchemy import Numeric, String
-from sqlalchemy.ext.asyncio import (AsyncAttrs, async_sessionmaker,
-                                    create_async_engine)
+from sqlalchemy.ext.asyncio import (
+    AsyncAttrs,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, mapped_column
 
 from core.config import PROJECT_SETTINGS
@@ -54,6 +57,14 @@ timestamp_auto = Annotated[
     datetime.datetime,
     mapped_column(
         default=datetime.datetime.now,
+    ),
+]
+
+uuid_pk = Annotated[
+    str,
+    mapped_column(
+        String(36),
+        primary_key=True,
     ),
 ]
 str_127 = Annotated[

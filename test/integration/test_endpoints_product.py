@@ -1,7 +1,11 @@
 import logging
 from decimal import Decimal
 from test.conftest import PRODUCT_DATA
-from test.integration import NON_EXISTING_PRODUCT_ID, UNAUTHORIZED_RESPONSE
+from test.integration import (
+    NON_EXISTING_PRODUCT_ID,
+    UNAUTHORIZED_RESPONSE,
+    is_valid_uuid,
+)
 
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,14 +35,16 @@ async def test_admin_create_product(
 
     assert response.status_code == 201
 
-    json_result = response.json()
+    product_json = response.json()["product"]
     # note: CamelCase
-    assert json_result["product_name"] == "Test Phone"
+    assert product_json["product_name"] == "Test Phone"
     # note: scale is 2 (set in Pydantic)
-    assert json_result["unit_price"] == "100.00"
-    assert json_result["units_in_stock"] == 5
-    assert json_result["type"] == ProductType.PHONE.value
-    assert "product_id" in json_result
+    assert product_json["unit_price"] == "100.00"
+    assert product_json["units_in_stock"] == 5
+    assert product_json["type"] == ProductType.PHONE.value
+    assert "product_id" in product_json
+
+    assert is_valid_uuid(response.json()["task_id"])
 
 
 async def test_user_get_product_detail(

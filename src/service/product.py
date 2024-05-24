@@ -5,12 +5,14 @@ Database CRUD operations for FastAPI service.
 import logging
 from collections.abc import Sequence
 
+from celery.result import AsyncResult
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import repository.product as product_repo
 from model.product import Product
 from schema.product import ProductCreate, ProductUpdate
+from task_queue.tasks import send_email
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +20,17 @@ logger = logging.getLogger(__name__)
 async def create_product(
     session: AsyncSession,
     product: ProductCreate,
-) -> Product:
+) -> tuple[Product, str]:
     db_product = await product_repo.create_product(session, product)
 
     # test: try and comment out `expire_on_commit=False`
-    logger.debug(f"Product created: {db_product.product_id}")
+    product_id = db_product.product_id
+    logger.debug(f"Product created: {product_id}")
 
-    return db_product
+    # send a notification email for product creation
+    result: AsyncResult = send_email.delay(product_id)
+
+    return db_product, result.id
 
 
 async def get_product(

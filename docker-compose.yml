@@ -17,6 +17,17 @@ services:
             - local-linux
         volumes:
             - postgres_data:/docker-entrypoint-initdb.d
+    redis-7:
+        image: redis:7
+        container_name: local-redis
+        restart: "unless-stopped"
+        ports:
+          - 6379:6379
+        networks:
+            - local-linux
+        volumes:
+            - redis_data:/usr/local/etc/redis
+        command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 volumes:
     postgres_data:
         driver: local
@@ -24,5 +35,11 @@ volumes:
             type: none
             o: bind
             device: ./docker/postgres
+    redis_data:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ./docker/redis
 networks:
     local-linux:
