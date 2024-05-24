@@ -3,9 +3,6 @@ import logging
 from httpx import AsyncClient
 
 from core.config import PROJECT_SETTINGS
-from main import app
-
-from .conftest import BASE_URL
 
 logger = logging.getLogger(__name__)
 

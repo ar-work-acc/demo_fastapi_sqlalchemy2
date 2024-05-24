@@ -15,7 +15,7 @@ DUMMY_PRODUCT_ID = 999_999
 
 async def test_send_mail(
     session: AsyncSession,
-    monkeypatch,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
 
     product_id = DUMMY_PRODUCT_ID
@@ -35,7 +35,7 @@ async def test_send_mail(
     assert system_email.is_sent
 
 
-async def test_send_email_exception(monkeypatch) -> None:
+async def test_send_email_exception(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(Task, "retry", MagicMock(side_effect=Retry))
     monkeypatch.setattr(Task, "request", MagicMock(side_effect=Exception))
 

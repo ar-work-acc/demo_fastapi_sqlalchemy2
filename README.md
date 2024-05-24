@@ -33,7 +33,13 @@ Run tests:
 ./run_pytest.sh
 ```
 
-You can access the FastAPI Swagger UI page at
+Checking mypy issues:
+
+```bash
+mypy --disallow-untyped-defs src test
+```
+
+Access FastAPI's Swagger UI page at
 [http://localhost:8000/docs](http://localhost:8000/docs).
 
 ## Dependencies

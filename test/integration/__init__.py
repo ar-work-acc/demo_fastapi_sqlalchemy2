@@ -1,3 +1,4 @@
+from typing import Any
 import uuid
 
 UNAUTHORIZED_RESPONSE = {
@@ -7,7 +8,7 @@ UNAUTHORIZED_RESPONSE = {
 NON_EXISTING_PRODUCT_ID = 1_000_000
 
 
-def is_valid_uuid(val):
+def is_valid_uuid(val: Any) -> bool:
     try:
         uuid.UUID(str(val))
         return True

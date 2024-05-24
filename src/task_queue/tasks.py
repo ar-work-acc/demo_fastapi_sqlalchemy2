@@ -33,7 +33,7 @@ SessionMaker = sessionmaker(
     retry_backoff=3 * 60,  # exponential backoff
     compression="gzip",
 )
-def send_email(self: Task, product_id: int):
+def send_email(self: Task, product_id: int) -> str:
     """Send the email with a task, and save the email (with status) + task ID
     in the database. After the task is complete, update the email status to
     "sent". This should be handled by a SystemEmail SQLAlchemy model.
