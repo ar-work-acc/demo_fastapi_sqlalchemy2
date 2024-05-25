@@ -35,7 +35,9 @@ async def test_send_mail(
     assert system_email.is_sent
 
 
-async def test_send_email_exception(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_send_email_exception(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setattr(Task, "retry", MagicMock(side_effect=Retry))
     monkeypatch.setattr(Task, "request", MagicMock(side_effect=Exception))
 

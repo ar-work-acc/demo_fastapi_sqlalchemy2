@@ -1,21 +1,25 @@
+"""
+Note: Celery doesn't provide explicit asyncio support. You might want to find
+a better service to use.
+(RuntimeError: asyncio.run() cannot be called from a running event loop)
+
+Normally, you would want to use tasks to run CPU intensive jobs, not IO-bound
+ones. This is just for demo purposes, not actually the best way to deal with
+it.
+"""
+
 from celery import Celery, Task
 from celery.utils.log import get_task_logger
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
+import repository.email as repo_email
 from core.config import PROJECT_SETTINGS
 from model.email import NotificationType, SystemEmail
 
 from .config import Config
 
-logger = get_task_logger(__name__)
-
-
-app = Celery("tasks")
-app.config_from_object(Config)
-
-
-# Celery doesn't work with async:
+# Celery doesn't work with async, so we need to use a synchronous session
 engine = create_engine(
     str(PROJECT_SETTINGS.SQLALCHEMY_DATABASE_URL_SYNC),
 )
@@ -23,9 +27,44 @@ SessionMaker = sessionmaker(
     bind=engine,
 )
 
+logger = get_task_logger(__name__)
 
-@app.task(
+# Celery app
+celery_app = Celery("tasks")
+celery_app.config_from_object(Config)
+
+
+def create_and_send_system_email(
+    session: Session,
+    task_id: str,
+    product_id: int,
+) -> SystemEmail:
+    """Create system email for the product, send it, and update its status.
+
+    Args:
+        session (Session): The synchronous session object.
+        task_id (str): Celery task UUID.
+        product_id (int): PK of target product.
+
+    Returns:
+        SystemEmail: The system email object created.
+    """
+    repo_email.create_system_email(
+        session,
+        task_id=task_id,
+        target_id=product_id,
+        type=NotificationType.PRODUCT,
+    )
+    # TODO send email, query for current product info to construct it
+    system_email = repo_email.update_system_email_status(
+        session, task_id, status=True
+    )
+    return system_email
+
+
+@celery_app.task(
     bind=True,
+    queue="default",
     ignore_result=True,  # you don't need the results here
     track_started=True,
     rate_limit="60/m",  # per worker instance rate limit
@@ -34,9 +73,8 @@ SessionMaker = sessionmaker(
     compression="gzip",
 )
 def send_email(self: Task, product_id: int) -> str:
-    """Send the email with a task, and save the email (with status) + task ID
-    in the database. After the task is complete, update the email status to
-    "sent". This should be handled by a SystemEmail SQLAlchemy model.
+    """
+    Task to send a system notification email for product creation.
 
     Args:
         self (Task): task, see
@@ -51,25 +89,12 @@ def send_email(self: Task, product_id: int) -> str:
     try:
         task_id = str(self.request.id)
         logger.debug(
-            f"Executing task {task_id}: Sending product creation email..."
+            f"Executing task #{task_id}: Sending product creation email..."
         )
-
         session = SessionMaker()
-
-        # save system email (status: not sent)
-        system_email = SystemEmail(
-            task_id=task_id,
-            target_id=product_id,
-            type=NotificationType.PRODUCT,
+        system_email = create_and_send_system_email(
+            session, task_id, product_id
         )
-        session.add(system_email)
-        session.commit()
-
-        # TODO send email, query for product info
-
-        # update system email status
-        system_email.is_sent = True
-        session.commit()
 
         return system_email.task_id
     except Exception as exc:

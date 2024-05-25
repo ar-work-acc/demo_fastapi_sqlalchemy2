@@ -20,7 +20,7 @@ python -m core.initialize_data  # add initial users
 uvicorn main:app --reload  # start FastAPI app
 ```
 
-Starting/stopping Celery:
+Starting/stopping Celery (logs are written to celery.log):
 
 ```bash
 ./celery.sh start  # start Celery workers
