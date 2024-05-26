@@ -1,11 +1,10 @@
 """
-Note: Celery doesn't provide explicit asyncio support. You might want to find
-a better service to use.
-(RuntimeError: asyncio.run() cannot be called from a running event loop)
+Note: Celery doesn't provide asyncio support. You might want to find
+a better service for your project.
 
 Normally, you would want to use tasks to run CPU intensive jobs, not IO-bound
-ones. This is just for demo purposes, not actually the best way to deal with
-it.
+ones. This is just for demonstrating the use of Celery, and is NOT the best
+solution.
 """
 
 from celery import Celery, Task

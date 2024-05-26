@@ -1,12 +1,12 @@
 # FastAPI + SQLAlchemy 2.0 Demo Project
 
 This is a demo project for FastAPI + SQLAlchemy 2.0, which can serve as a
-template for your project. ASGI is used, so you should use asynchronous settings
+template for future ones. ASGI is used, so you should use asynchronous settings
 in Alembic (initialization and database URLs), and also in the database URLs in
 Python code (asyncpg).
 
-Note: Celery is added for demonstrating its usage, but it does not work well
-with asynchronous code and should be replaced with other services.
+Note: Celery is added for demonstration, but it does not work well with
+asynchronous code and should be replaced with other services.
 
 ## Running the Application (Summary)
 
