@@ -38,8 +38,19 @@ async def test_send_mail(
 async def test_send_email_exception(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # emulate Task.retry()
     monkeypatch.setattr(Task, "retry", MagicMock(side_effect=Retry))
-    monkeypatch.setattr(Task, "request", MagicMock(side_effect=Exception))
+
+    # we need to mock SessionMaker
+    monkeypatch.setattr(
+        "task_queue.tasks.SessionMaker",
+        MagicMock(),
+    )
+    # since we're raising an error when sending an email
+    monkeypatch.setattr(
+        "task_queue.tasks.create_and_send_system_email",
+        MagicMock(side_effect=RuntimeError("Error sending system email!")),
+    )
 
     with pytest.raises(Retry):
         await send_email(DUMMY_PRODUCT_ID)
