@@ -78,7 +78,6 @@ def send_email(self: Task, product_id: int) -> str:
     Args:
         self (Task): task, see
         https://docs.celeryq.dev/en/stable/userguide/tasks.html#task-request
-        session (AsyncSession): the session object
         product_id (int): target product's primary key
 
     Raises:
