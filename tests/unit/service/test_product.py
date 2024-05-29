@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from model.product import ProductType
 from schema.product import ProductCreate
 from service.product import create_product
-from test.integration import is_valid_uuid
+from tests.integration import is_valid_uuid
 
 
 async def test_get_product(session: AsyncSession) -> None:

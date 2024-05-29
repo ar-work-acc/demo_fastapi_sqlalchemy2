@@ -1,7 +1,7 @@
 import logging
 from decimal import Decimal
-from test.conftest import PRODUCT_DATA
-from test.integration import (
+from tests.conftest import PRODUCT_DATA
+from tests.integration import (
     NON_EXISTING_PRODUCT_ID,
     UNAUTHORIZED_RESPONSE,
     is_valid_uuid,
